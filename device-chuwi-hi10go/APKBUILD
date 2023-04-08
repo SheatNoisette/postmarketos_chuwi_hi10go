@@ -1,0 +1,73 @@
+# Reference: <https://postmarketos.org/devicepkg>
+pkgname=device-chuwi-hi10go
+pkgdesc="Chuwi Hi 10 Go"
+pkgver=0.1
+pkgrel=1
+url="https://postmarketos.org"
+license="MIT"
+arch="x86_64"
+options="!check !archcheck pmb:strict"
+depends="
+	postmarketos-base
+	linux-chuwi-hi10go
+	linux-firmware
+	mesa-vulkan-intel
+	intel-media-driver
+	intel-ucode
+	libva-intel-driver
+"
+makedepends="
+	devicepkg-dev
+	grub
+	grub-efi
+"
+source="
+	deviceinfo
+	grub.cfg
+	grub_early.cfg
+"
+
+build() {
+	devicepkg_build $startdir $pkgname
+	grub-mkimage \
+		--config="$srcdir/grub_early.cfg" \
+		--prefix="" \
+		--output="bootx64.efi" \
+		--format="x86_64-efi" \
+		--compression="xz" \
+		all_video \
+		cat \
+		configfile \
+		disk \
+		echo \
+		efi_gop \
+		fat \
+		gzio \
+		help \
+		iso9660 \
+		linux \
+		ls \
+		normal \
+		part_gpt \
+		part_msdos \
+		search \
+		search_label \
+		test \
+		true
+}
+
+package() {
+	devicepkg_package $startdir $pkgname
+
+	install -Dm644 "$srcdir"/bootx64.efi \
+		"$pkgdir"/boot/EFI/Boot/bootx64.efi
+	
+	install -Dm644 "$srcdir"/grub.cfg \
+		"$pkgdir"/boot/grub/grub.cfg
+}
+
+sha512sums="
+3ebd0d2f9e96997b908837463c5479d0258ac68dfd30156b80db8656c0dc59461defaf0d53d5795805fa2155fcbeb696c66ff933322c60059c4ef1e2db3cf9cd  deviceinfo
+df01597cd26ec4bdce9d9b871c8a30e4bea1f39e4bba952ac439cb126279eb204a222086e2fe40a2eb77e850e3c44789220fffb346452e3b2f63f9564ccb6cca  grub.cfg
+0f9357d4eea089628fbceb1e3e96d21a3f4329aeb6743158a6f877f967ef274506404eba949d5f01b7e1adea149f9a3aef992a5e8cd4181f93ab00909b1c5ecd  grub_early.cfg
+"

@@ -1,0 +1,66 @@
+_flavor="chuwi-hi10go"
+pkgname=linux-$_flavor
+pkgver=6.2.1
+pkgrel=1
+pkgdesc="Kernel mainline for the Chuwi Hi10 Go"
+arch="x86_64"
+url="https://kernel.org"
+license="GPL-2.0-only"
+options="!strip !check !tracedeps
+	pmb:kconfigcheck-nftables
+	"
+makedepends="
+ 	linux-headers
+    bash
+	bison
+	findutils
+	flex
+	openssl-dev
+	perl
+    python3
+    diffutils
+    elfutils-dev
+	postmarketos-installkernel
+	xz
+"
+
+case $pkgver in
+	*.*.*)	_kernver=${pkgver%.0};;
+	*.*)	_kernver=$pkgver;;
+esac
+source="
+	https://cdn.kernel.org/pub/linux/kernel/v${_kernver%%.*}.x/linux-$_kernver.tar.xz
+	config-$_flavor.$arch
+"
+builddir="$srcdir/linux-$_kernver"
+
+prepare() {
+	default_prepare
+	cp "$srcdir/config-$_flavor.$arch" .config
+}
+
+build() {
+	unset LDFLAGS
+	make ARCH="$arch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-$_flavor" \
+		V=1
+}
+
+package() {
+	mkdir -p "$pkgdir"/boot
+	make modules_install \
+		ARCH="$arch" \
+		INSTALL_PATH="$pkgdir"/boot \
+		INSTALL_MOD_PATH="$pkgdir" \
+		INSTALL_MOD_STRIP=1
+	rm -f "$pkgdir"/lib/modules/*/build "$pkgdir"/lib/modules/*/source
+	# Copy kernel
+	cp "$builddir/arch/$arch/boot/bzImage" "$pkgdir"/boot/vmlinuz-$_flavor
+	install -D "$builddir/include/config/kernel.release" \
+		"$pkgdir/usr/share/kernel/$_flavor/kernel.release"
+}
+
+sha512sums="
+79d3465955dd557dc599fa1c18c7a68699f4febdd7264fe4e223c694e879ef5bb65fff9fad1ec5599f894ad6519bad292efbd5b9990dac3223d843f5c22c65f2  linux-6.2.1.tar.xz
+94203f67b45502d565cfbe47e4c3cbdd038c7dae4cedfa4c6741a55ef6ece4b8db9cfabe92198fec0ec2b176626f710ce9a5a4753fe37441e70e725cbbe08e95  config-chuwi-hi10go.x86_64
+"
