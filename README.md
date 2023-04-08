@@ -3,7 +3,7 @@
 ![Chuwi Hi10 Go tablet](pics/pmos_demo.jpg)
 
 This is the port of [PostmarketOS](https://postmarketos.org/) to the 
-[Chuwi Hi10 Go](https://www.chuwi.com/product-item/hi10-go/) tablet.
+[Chuwi Hi10 Go](https://www.chuwi.com/product/items/Chuwi-Hi10-Go.html) tablet.
 As the device can boot into a mainline Linux kernel, it doesn't make sense to
 support it in the [postmarketOS](https://postmarketos.org/) project which
 aims to support devices that is unsupported by the upstream Linux kernel and
@@ -13,7 +13,7 @@ abandoned by the vendor.
 
 This is a list of the main hardware components of the device for the 
 Chuwi Hi10 Go tablet (CWI513 variant):
-- SoC: Intel Celeron N5095
+- SoC: Intel Celeron N5100
 - Dual channel 6GB LPDDR4 RAM from Micron
 - SCY E128BS 128GB Flash (eMMC 5.1)
 - Realtek RTS5170 SD card reader
